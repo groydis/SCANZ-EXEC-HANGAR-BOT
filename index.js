@@ -7,7 +7,8 @@ const {
   DISCORD_CHANNEL_ID, 
   TARGET_URL, 
   THRESHOLD_MINUTES = 30, 
-  POLL_SECONDS = 60 
+  POLL_SECONDS = 60,
+  EXEC_PINGS_ROLE_ID
 } = process.env;
 
 const client = new Client({ 
@@ -164,14 +165,16 @@ async function postOpenWarning(nextOpen) {
     const startTimestamp = Math.floor(nextOpen.start.getTime() / 1000);
     const endTimestamp = nextOpen.end ? Math.floor(nextOpen.end.getTime() / 1000) : null;
     
+    const roleMention = EXEC_PINGS_ROLE_ID ? `<@&${EXEC_PINGS_ROLE_ID}>` : '@exec-pings';
+    
     let message = `🚨 Executive Hangar Alert 🚨
-@exec-pings The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
+${roleMention} The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
 Once it opens, it will remain open until <t:${endTimestamp}:F>.
 Source: ${TARGET_URL}`;
     
     if (!endTimestamp) {
       message = `🚨 Executive Hangar Alert 🚨
-@exec-pings The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
+${roleMention} The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
 Source: ${TARGET_URL}`;
     }
     
