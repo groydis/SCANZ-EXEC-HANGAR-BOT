@@ -166,6 +166,12 @@ This is useful for monitoring the bot's health and ensuring it's fetching schedu
 - Discord bot with appropriate permissions (Send Messages, Use Slash Commands)
 - Internet access to exec.xyxyll.com
 
+## About SCANZ
+
+If you are interested in joining an AUS/NZ Star Citizen org or just looking to be part of a great SC community, check out SCANZ at: https://wescanz.com/
+
+We are an inclusive community open to everyone.
+
 ## License
 
 MIT
