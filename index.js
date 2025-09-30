@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { Client, GatewayIntentBits, Partials, Events } from 'discord.js';
 import { chromium } from '@playwright/test';
+import http from 'http';
 
 const { 
   DISCORD_TOKEN, 
@@ -8,7 +9,8 @@ const {
   TARGET_URL, 
   THRESHOLD_MINUTES = 30, 
   POLL_SECONDS = 60,
-  EXEC_PINGS_ROLE_ID
+  EXEC_PINGS_ROLE_ID,
+  PORT = 3000
 } = process.env;
 
 const client = new Client({ 
@@ -21,6 +23,8 @@ let lastAnnouncedOpen = null;
 let lastFetchTime = 0;
 let cachedSchedule = null;
 const cooldowns = new Map();
+let lastSuccessfulFetch = null;
+let botStartTime = Date.now();
 
 // Parse local date assuming Australia/Brisbane timezone
 function parseLocalDate(dateStr) {
@@ -121,6 +125,7 @@ async function fetchSchedule() {
     
     cachedSchedule = parsedSchedule;
     lastFetchTime = now;
+    lastSuccessfulFetch = Date.now();
     
     console.log('Schedule fetched successfully:', parsedSchedule.length, 'entries');
     return parsedSchedule;
@@ -337,6 +342,41 @@ process.on('SIGINT', () => {
   console.log('Shutting down bot...');
   client.destroy();
   process.exit(0);
+});
+
+// Health check server
+const healthCheckServer = http.createServer((req, res) => {
+  if (req.url === '/health' || req.url === '/') {
+    const uptime = Math.floor((Date.now() - botStartTime) / 1000);
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = uptime % 60;
+    
+    const timeSinceLastFetch = lastSuccessfulFetch 
+      ? Math.floor((Date.now() - lastSuccessfulFetch) / 1000) 
+      : null;
+    
+    const status = {
+      status: 'ok',
+      bot: client.user ? client.user.tag : 'Not logged in',
+      uptime: `${hours}h ${minutes}m ${seconds}s`,
+      lastSuccessfulFetch: lastSuccessfulFetch 
+        ? `${timeSinceLastFetch}s ago` 
+        : 'Never',
+      cachedEntries: cachedSchedule ? cachedSchedule.length : 0,
+      timestamp: new Date().toISOString()
+    };
+    
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(status, null, 2));
+  } else {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
+  }
+});
+
+healthCheckServer.listen(PORT, () => {
+  console.log(`Health check server running on port ${PORT}`);
 });
 
 // Start the bot
