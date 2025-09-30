@@ -165,13 +165,13 @@ async function postOpenWarning(nextOpen) {
     const endTimestamp = nextOpen.end ? Math.floor(nextOpen.end.getTime() / 1000) : null;
     
     let message = `🚨 Executive Hangar Alert 🚨
-The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
+@exec-pings The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
 Once it opens, it will remain open until <t:${endTimestamp}:F>.
 Source: ${TARGET_URL}`;
     
     if (!endTimestamp) {
       message = `🚨 Executive Hangar Alert 🚨
-The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
+@exec-pings The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
 Source: ${TARGET_URL}`;
     }
     
