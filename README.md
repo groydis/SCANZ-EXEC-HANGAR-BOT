@@ -78,24 +78,29 @@ npm start
 - `TARGET_URL`: The website to monitor (default: https://exec.xyxyll.com/)
 - `THRESHOLD_MINUTES`: Minutes before opening to send warning (default: 30)
 - `POLL_SECONDS`: How often to check for updates (default: 60)
-- `PORT`: Port for health check server (default: 3000, use 10000 for Render)
+- `PORT`: Port for health check server (default: 3000, Railway sets this automatically)
 
 ## Deployment
 
-### Render (Recommended)
+### Railway (Recommended)
 
-1. Fork/clone this repository to GitHub
-2. Go to [Render.com](https://render.com) and sign up
-3. Create a new **Web Service**
-4. Connect your GitHub repository
-5. Configure settings:
-   - **Language**: Docker
-   - **Build Context**: `.` (root directory)
-   - **Dockerfile Path**: `Dockerfile`
-   - **Health Check Path**: `/health`
-6. Add environment variables (see Configuration section above)
-   - **Important**: Set `PORT=10000` for Render
-7. Deploy!
+1. Go to [Railway.app](https://railway.app) and sign up with GitHub
+2. Click **"Deploy from GitHub repo"**
+3. Select your `SCANZ-EXEC-HANGAR-BOT` repository
+4. Railway will automatically detect the Dockerfile and configure the build
+5. Add environment variables in the **Variables** tab:
+   - `DISCORD_TOKEN`
+   - `DISCORD_CHANNEL_ID`
+   - `APPLICATION_ID`
+   - `GUILD_ID`
+   - `EXEC_PINGS_ROLE_ID`
+   - `TARGET_URL=https://exec.xyxyll.com/`
+   - `THRESHOLD_MINUTES=30`
+   - `POLL_SECONDS=60`
+   - Railway will automatically set `PORT` for you
+6. Deploy!
+
+Railway will automatically build and deploy your bot. It will also automatically redeploy when you push changes to GitHub.
 
 ### Docker (Local or VPS)
 
