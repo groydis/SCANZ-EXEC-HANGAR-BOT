@@ -23,6 +23,24 @@ const cooldowns = new Map();
 
 // Parse local date assuming Australia/Brisbane timezone
 function parseLocalDate(dateStr) {
+  // Handle format like "9/30/2025, 10:50:40 AM"
+  if (dateStr.includes(',')) {
+    const [datePart, timePart] = dateStr.split(', ');
+    const [month, day, year] = datePart.split('/').map(Number);
+    const [time, period] = timePart.split(' ');
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    
+    let hour24 = hours;
+    if (period === 'PM' && hours !== 12) {
+      hour24 += 12;
+    } else if (period === 'AM' && hours === 12) {
+      hour24 = 0;
+    }
+    
+    return new Date(year, month - 1, day, hour24, minutes, seconds);
+  }
+  
+  // Handle format like "10:50:40 AM" (fallback)
   const [time, period] = dateStr.split(' ');
   const [hours, minutes] = time.split(':').map(Number);
   let hour24 = hours;
