@@ -196,19 +196,22 @@ async function handleSlashCommand(interaction) {
     const remaining = Math.ceil((60000 - (now - cooldowns.get(userId))) / 1000);
     await interaction.reply({ 
       content: `Please wait ${remaining} seconds before using this command again.`, 
-      ephemeral: true 
+      flags: 64 // EPHEMERAL flag
     });
     return;
   }
   
   cooldowns.set(userId, now);
   
+  // Acknowledge the interaction immediately to prevent timeout
+  await interaction.deferReply();
+  
   try {
     const schedule = await fetchSchedule();
     const nextOpen = findNextOpen(schedule);
     
     if (!nextOpen) {
-      await interaction.reply('No upcoming hangar openings found in the schedule.');
+      await interaction.editReply('No upcoming hangar openings found in the schedule.');
       return;
     }
     
@@ -216,7 +219,7 @@ async function handleSlashCommand(interaction) {
     const timeUntilOpen = nextOpen.start.getTime() - now.getTime();
     
     if (timeUntilOpen <= 0) {
-      await interaction.reply('The hangar is currently open!');
+      await interaction.editReply('The hangar is currently open!');
       return;
     }
     
@@ -245,11 +248,15 @@ async function handleSlashCommand(interaction) {
 📅 Source: ${TARGET_URL}`;
     }
     
-    await interaction.reply(response);
+    await interaction.editReply(response);
     
   } catch (error) {
     console.error('Error handling slash command:', error);
-    await interaction.reply('Sorry, there was an error fetching the hangar schedule.');
+    try {
+      await interaction.editReply('Sorry, there was an error fetching the hangar schedule.');
+    } catch (replyError) {
+      console.error('Error replying to interaction:', replyError);
+    }
   }
 }
 
