@@ -153,6 +153,17 @@ function findNextOpen(schedule) {
   return null;
 }
 
+// Check if current time is within active hours (11am - 9pm AEST)
+function isActiveHours() {
+  const now = new Date();
+  // Convert to AEST (UTC+10)
+  const aestTime = new Date(now.getTime() + (10 * 60 * 60 * 1000));
+  const hour = aestTime.getUTCHours();
+  
+  // Active hours: 11am (11) to 9pm (21)
+  return hour >= 11 && hour < 21;
+}
+
 // Post warning message to Discord
 async function postOpenWarning(nextOpen) {
   try {
@@ -165,16 +176,18 @@ async function postOpenWarning(nextOpen) {
     const startTimestamp = Math.floor(nextOpen.start.getTime() / 1000);
     const endTimestamp = nextOpen.end ? Math.floor(nextOpen.end.getTime() / 1000) : null;
     
-    const roleMention = EXEC_PINGS_ROLE_ID ? `<@&${EXEC_PINGS_ROLE_ID}>` : '@exec-pings';
+    // Only mention role during active hours (11am - 9pm AEST)
+    const roleMention = (EXEC_PINGS_ROLE_ID && isActiveHours()) ? `<@&${EXEC_PINGS_ROLE_ID}>` : '';
+    const mentionText = roleMention ? `${roleMention} ` : '';
     
     let message = `🚨 Executive Hangar Alert 🚨
-${roleMention} The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
+${mentionText}The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
 Once it opens, it will remain open until <t:${endTimestamp}:F>.
 Source: ${TARGET_URL}`;
     
     if (!endTimestamp) {
       message = `🚨 Executive Hangar Alert 🚨
-${roleMention} The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
+${mentionText}The exec hangar is opening in ${THRESHOLD_MINUTES} minutes at <t:${startTimestamp}:F>.
 Source: ${TARGET_URL}`;
     }
     
