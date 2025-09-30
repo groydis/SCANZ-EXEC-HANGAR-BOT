@@ -172,6 +172,12 @@ If you are interested in joining an AUS/NZ Star Citizen org or just looking to b
 
 We are an inclusive community open to everyone.
 
+## Credits
+
+**Special thanks to Xyxyll** for creating and maintaining https://exec.xyxyll.com/ - the executive hangar timer that this bot monitors. Xyxyll did all the hard work tracking and providing accurate info on executive hangar timings to the Star Citizen community. This bot simply leverages their excellent work to provide Discord notifications. We're incredibly impressed with their dedication to the SC community!
+
+The timer site is released under the [MIT License](https://exec.xyxyll.com/) © 2025 Xyxyll.
+
 ## License
 
 MIT
